@@ -33,6 +33,8 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     // Mongo Client
     implementation("org.litote.kmongo:kmongo-coroutine:$kmongo_version")
+    // Apache Comms
+    implementation("commons-codec:commons-codec:1.15")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
