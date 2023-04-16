@@ -1,10 +1,13 @@
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
+val serial_version: String by project
+val kmongo_version: String by project
 
 plugins {
     kotlin("jvm") version "1.8.20"
     id("io.ktor.plugin") version "2.2.4"
+    kotlin("plugin.serialization") version "1.8.20"
 }
 
 group = "one.karaage"
@@ -24,6 +27,13 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-cio-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serial_version")
+    // JWT
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    // Mongo Client
+    implementation("org.litote.kmongo:kmongo-coroutine:$kmongo_version")
+
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
