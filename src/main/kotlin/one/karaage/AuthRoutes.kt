@@ -10,7 +10,14 @@ import one.karaage.data.models.User
 import one.karaage.data.models.UserDataSource
 import one.karaage.data.requests.AuthRequest
 import one.karaage.security.hashing.HashingService
+import one.karaage.security.hashing.SaltedHash
+import one.karaage.security.token.TokenClaim
+import one.karaage.security.token.TokenConfig
+import one.karaage.security.token.TokenService
 
+/**
+ * User is added to database (with salt ofc)
+ */
 fun Route.signUp(
     hashingService: HashingService,
     userDataSource: UserDataSource,
@@ -37,5 +44,53 @@ fun Route.signUp(
         }
 
         call.respond(HttpStatusCode.OK)
+    }
+}
+
+/**
+ * Session token is provided after verification
+ */
+fun Route.signIn(
+    userDataSource: UserDataSource,
+    hashingService: HashingService,
+    tokenService: TokenService,
+    tokenConfig: TokenConfig,
+) {
+    post("signin"){
+        val request = call.receiveNullable<AuthRequest>() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val user = userDataSource.getUserByUsername(request.username)
+        if(user == null){
+            call.respond(HttpStatusCode.Conflict)
+            return@post
+        }
+
+        val isValidPassword = hashingService.verify(
+            user.password,
+            SaltedHash(
+                "😲",
+                user.salt
+            )
+        )
+        if(!isValidPassword){
+            call.respond(HttpStatusCode.Conflict)
+            return@post
+        }
+
+        val token = tokenService.generate(
+            tokenConfig,
+            TokenClaim(
+                "userId",
+                user.id.toString()
+            )
+        )
+
+        call.respond(
+            HttpStatusCode.OK,
+            message = token
+        )
     }
 }
