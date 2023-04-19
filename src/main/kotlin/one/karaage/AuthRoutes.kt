@@ -2,9 +2,11 @@ package one.karaage
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import one.karaage.data.models.User
 import one.karaage.data.models.UserDataSource
@@ -92,5 +94,13 @@ fun Route.signIn(
             HttpStatusCode.OK,
             message = token
         )
+    }
+}
+
+fun Route.authenticate(){
+    authenticate {
+        get("authenticate"){
+            call.respond(HttpStatusCode.OK)
+        }
     }
 }
