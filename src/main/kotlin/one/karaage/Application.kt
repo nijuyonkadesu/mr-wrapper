@@ -3,12 +3,12 @@ package one.karaage
 import io.ktor.server.application.Application
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import one.karaage.data.models.MongoUserDataSource
-import one.karaage.data.models.User
 import one.karaage.plugins.configureRouting
-import one.karaage.plugins.customerRouting
+import one.karaage.plugins.configureSecurity
+import one.karaage.security.hashing.SHA256HashingService
+import one.karaage.security.token.JwtTokenService
+import one.karaage.security.token.TokenConfig
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
@@ -24,15 +24,18 @@ fun Application.module() {
         connectionString = "mongodb+srv://guts:${mongoPw}@mrwrapper.zk09mas.mongodb.net/?retryWrites=true&w=majority"
     ).coroutine.getDatabase(dbName)
 
-    val mongoUserDataSource = MongoUserDataSource(db)
-    GlobalScope.launch {
-        val user = User(
-            userName = "test",
-            password = "test",
-            salt = "sugar"
-        )
-        mongoUserDataSource.insertNewUser(user)
-    }
+    val userDataSource = MongoUserDataSource(db)
+
+    val tokenService = JwtTokenService()
+    val tokenConfig = TokenConfig(
+        issuer = environment.config.property("jwt.issuer").getString(),
+        audience = environment.config.property(("jwt.audience")).getString(),
+        expiresIn = 365L * 24L * 60L * 60L * 1000L, // 365 days 24 hours 60 minutes 60 x 1 seconds
+        secret = System.getenv("JWT_SECRET")
+    )
+
+    val hashingService = SHA256HashingService()
+
     configureRouting()
-    customerRouting()
+    configureSecurity(tokenConfig)
 }
