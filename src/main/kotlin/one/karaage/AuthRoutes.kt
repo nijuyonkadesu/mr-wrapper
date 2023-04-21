@@ -3,6 +3,8 @@ package one.karaage
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -101,6 +103,16 @@ fun Route.authenticate(){
     authenticate {
         get("authenticate"){
             call.respond(HttpStatusCode.OK)
+        }
+    }
+}
+
+fun Route.getSecretInfo(){
+    authenticate {
+        get("secret"){
+            val principal = call.principal<JWTPrincipal>()
+            val userId = principal?.getClaim("userId", String::class)
+            call.respond(HttpStatusCode.OK, "Your user id is $userId")
         }
     }
 }
