@@ -26,7 +26,10 @@ repositories {
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-cio-jvm:$ktor_version")
+
+    // Logging and filtering
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-server-call-logging-jvm:$ktor_version")
 
     // Content Negotiation and Serialization
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
