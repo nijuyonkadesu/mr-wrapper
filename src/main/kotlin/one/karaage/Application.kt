@@ -6,6 +6,7 @@ import io.ktor.server.engine.embeddedServer
 import one.karaage.data.models.MongoUserDataSource
 import one.karaage.plugins.configureRouting
 import one.karaage.plugins.configureSecurity
+import one.karaage.plugins.configureSerialization
 import one.karaage.security.hashing.SHA256HashingService
 import one.karaage.security.token.JwtTokenService
 import one.karaage.security.token.TokenConfig
@@ -38,5 +39,5 @@ fun Application.module() {
 
     configureRouting(hashingService, userDataSource, tokenService, tokenConfig)
     configureSecurity(tokenConfig)
-    
+    configureSerialization()
 }
