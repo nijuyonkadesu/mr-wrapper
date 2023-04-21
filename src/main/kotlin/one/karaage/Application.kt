@@ -1,8 +1,6 @@
 package one.karaage
 
 import io.ktor.server.application.Application
-import io.ktor.server.cio.CIO
-import io.ktor.server.engine.embeddedServer
 import one.karaage.data.models.MongoUserDataSource
 import one.karaage.plugins.configureMonitoring
 import one.karaage.plugins.configureRouting
@@ -14,11 +12,10 @@ import one.karaage.security.token.TokenConfig
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
-fun main() {
-    embeddedServer(CIO, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-}
+fun main(args: Array<String>): Unit =
+    io.ktor.server.cio.EngineMain.main(args)
 
+@Suppress("unused") // application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
     val mongoPw = System.getenv("MONGO_PW")
     val dbName = "drive"
@@ -38,8 +35,8 @@ fun Application.module() {
 
     val hashingService = SHA256HashingService()
 
-    configureRouting(hashingService, userDataSource, tokenService, tokenConfig)
     configureSecurity(tokenConfig)
     configureSerialization()
     configureMonitoring()
+    configureRouting(hashingService, userDataSource, tokenService, tokenConfig)
 }
