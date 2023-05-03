@@ -8,8 +8,8 @@ class MongoUserDataSource(
 ): UserDataSource {
 
     private val users = db.getCollection<User>()
-    override suspend fun getUserByUsername(userName: String): User? {
-        return users.findOne(User::userName eq userName)
+    override suspend fun getUserByUsername(username: String): User? {
+        return users.findOne(User::username eq username)
     }
 
     override suspend fun insertNewUser(user: User): Boolean {

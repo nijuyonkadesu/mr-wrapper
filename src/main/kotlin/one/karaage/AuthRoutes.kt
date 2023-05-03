@@ -13,6 +13,7 @@ import io.ktor.server.routing.post
 import one.karaage.data.models.User
 import one.karaage.data.models.UserDataSource
 import one.karaage.data.requests.AuthRequest
+import one.karaage.data.responses.AuthResponse
 import one.karaage.security.hashing.HashingService
 import one.karaage.security.hashing.SaltedHash
 import one.karaage.security.token.TokenClaim
@@ -36,7 +37,7 @@ fun Route.signUp(
         // TODO: Throw appropriate error message for each fail case
         val saltedHash = hashingService.generateSaltedHash(request.password)
         val user = User(
-            userName = request.username,
+            username = request.username,
             password = saltedHash.hash,
             salt = saltedHash.salt
         )
@@ -68,19 +69,19 @@ fun Route.signIn(
 
         val user = userDataSource.getUserByUsername(request.username)
         if(user == null){
-            call.respond(HttpStatusCode.Conflict)
+            call.respond(HttpStatusCode.Conflict, "incorrect username / password")
             return@post
         }
 
         val isValidPassword = hashingService.verify(
-            user.password,
+            request.password,
             SaltedHash(
-                "😲",
+                user.password,
                 user.salt
             )
         )
         if(!isValidPassword){
-            call.respond(HttpStatusCode.Conflict)
+            call.respond(HttpStatusCode.Conflict, "wrong!")
             return@post
         }
 
@@ -94,7 +95,9 @@ fun Route.signIn(
 
         call.respond(
             HttpStatusCode.OK,
-            message = token
+            message = AuthResponse(
+                token = token
+            )
         )
     }
 }

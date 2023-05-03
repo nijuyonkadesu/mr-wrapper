@@ -10,17 +10,20 @@ class SHA256HashingService: HashingService {
      * generate seed -> toString() -> compute salt and value hash
      */
     override fun generateSaltedHash(value: String, saltLength: Int): SaltedHash {
-        val salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLength)
-        val saltAsHex = Hex.encodeHexString(salt)
+        val saltRaw = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLength)
+        val salt = Hex.encodeHexString(saltRaw)
         val hash = DigestUtils.sha256Hex("$salt$value")
+        //println("salt + password: $salt$value = $hash")
 
         return SaltedHash(
             hash = hash,
-            salt = saltAsHex
+            salt = salt
         )
     }
 
     override fun verify(value: String, saltedHash: SaltedHash): Boolean {
-        return DigestUtils.sha256Hex("${saltedHash.salt}${value}") == saltedHash.hash
+        val hash = DigestUtils.sha256Hex("${saltedHash.salt}${value}")
+        //println("salt + password: ${saltedHash.salt}${value} = $hash")
+        return hash == saltedHash.hash
     }
 }
