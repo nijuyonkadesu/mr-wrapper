@@ -14,7 +14,8 @@ import org.litote.kmongo.reactivestreams.KMongo
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.cio.EngineMain.main(args)
-
+// TODO: Refer ktor site for SSL / https tutorial in CIO
+// TODO: letsencrypt.org certificate for https authserver
 @Suppress("unused") // application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
     val mongoPw = System.getenv("MONGO_PW")
@@ -40,3 +41,4 @@ fun Application.module() {
     configureMonitoring()
     configureRouting(hashingService, userDataSource, tokenService, tokenConfig)
 }
+// TODO: Use https://github.com/kosi-libs/Kodein KODEINDI
